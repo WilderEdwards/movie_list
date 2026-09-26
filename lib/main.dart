@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'screens/home_screen.dart';
+
 void main() {
   runApp(const MovieWatchlistApp());
 }
@@ -16,6 +18,7 @@ class MovieWatchlistApp extends StatelessWidget {
         useMaterial3: true,
         colorSchemeSeed: Colors.indigo,
       ),
+      home: const HomeScreen(),
     );
   }
 }
