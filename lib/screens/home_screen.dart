@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 
-// Temporary in-file data so the HomeScreen runs on its own.
-// Next step will extract this into models/movie.dart + data/movies_data.dart.
-const List<String> _movieTitles = [
-  'Inception',
-  'The Matrix',
-  'Interstellar',
-  'Dune',
-  'Spider-Man: No Way Home',
-];
+import '../data/movies_data.dart';
+import '../models/movie.dart';
+import 'details_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  void _onMovieTap(BuildContext context, String title) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$title — details coming soon')),
+  void _openDetails(BuildContext context, Movie movie) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => DetailsScreen(movie: movie)),
     );
   }
 
@@ -35,12 +30,12 @@ class HomeScreen extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: _movieTitles.length,
+              itemCount: sampleMovies.length,
               itemBuilder: (context, index) {
-                final title = _movieTitles[index];
+                final movie = sampleMovies[index];
                 return MovieListItem(
-                  title: title,
-                  onTap: () => _onMovieTap(context, title),
+                  movie: movie,
+                  onTap: () => _openDetails(context, movie),
                 );
               },
             ),
@@ -50,7 +45,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
 
 class HomeHeader extends StatelessWidget {
   final String title;
@@ -75,18 +69,21 @@ class HomeHeader extends StatelessWidget {
 }
 
 class MovieListItem extends StatelessWidget {
-  final String title;
+  final Movie movie;
   final VoidCallback onTap;
 
-  const MovieListItem({super.key, required this.title, required this.onTap});
+  const MovieListItem({super.key, required this.movie, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: ListTile(
-        leading: PosterPlaceholder(title: title),
-        title: Text(title),
+        leading: PosterPlaceholder(
+          title: movie.title,
+          posterPath: movie.posterPath,
+        ),
+        title: Text(movie.title),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
       ),
@@ -96,24 +93,39 @@ class MovieListItem extends StatelessWidget {
 
 class PosterPlaceholder extends StatelessWidget {
   final String title;
+  final String posterPath;
 
-  const PosterPlaceholder({super.key, required this.title});
+  const PosterPlaceholder({
+    super.key,
+    required this.title,
+    required this.posterPath,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Stands in for Image.asset() until assets/ are added.
-    final initial = title.isNotEmpty ? title[0] : '?';
-    return Container(
-      width: 48,
-      height: 64,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        initial,
-        style: Theme.of(context).textTheme.titleLarge,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.asset(
+        posterPath,
+        width: 48,
+        height: 64,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          final initial = title.isNotEmpty ? title[0] : '?';
+          return Container(
+            width: 48,
+            height: 64,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              initial,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          );
+        },
       ),
     );
   }
