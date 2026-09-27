@@ -30,6 +30,7 @@ class HomeScreen extends StatelessWidget {
           ),
           Expanded(
             child: ListView.builder(
+              padding: const EdgeInsets.only(bottom: 16),
               itemCount: sampleMovies.length,
               itemBuilder: (context, index) {
                 final movie = sampleMovies[index];
@@ -77,13 +78,16 @@ class MovieListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         leading: PosterPlaceholder(
           title: movie.title,
           posterPath: movie.posterPath,
         ),
         title: Text(movie.title),
+        subtitle: Text(movie.cast.first),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
       ),
