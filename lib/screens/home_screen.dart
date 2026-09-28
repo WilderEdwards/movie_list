@@ -3,23 +3,64 @@ import 'package:flutter/material.dart';
 import '../data/movies_data.dart';
 import '../models/movie.dart';
 import 'details_screen.dart';
+import 'favorites_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  void _openDetails(BuildContext context, Movie movie) {
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  void _openDetails(Movie movie) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => DetailsScreen(movie: movie)),
-    );
+    ).then((_) => setState(() {}));
+  }
+
+  void _openFavorites() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const FavoritesScreen()),
+    ).then((_) => setState(() {}));
   }
 
   @override
   Widget build(BuildContext context) {
+    final favoriteCount = sampleMovies.where((m) => m.isFavorite).length;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Movie Watchlist'),
         centerTitle: true,
+        actions: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.favorite),
+                onPressed: _openFavorites,
+              ),
+              if (favoriteCount > 0)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '$favoriteCount',
+                      style: const TextStyle(fontSize: 10, color: Colors.white),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,7 +77,9 @@ class HomeScreen extends StatelessWidget {
                 final movie = sampleMovies[index];
                 return MovieListItem(
                   movie: movie,
-                  onTap: () => _openDetails(context, movie),
+                  onTap: () => _openDetails(movie),
+                  onFavorite: () =>
+                      setState(() => movie.isFavorite = !movie.isFavorite),
                 );
               },
             ),
@@ -72,8 +115,14 @@ class HomeHeader extends StatelessWidget {
 class MovieListItem extends StatelessWidget {
   final Movie movie;
   final VoidCallback onTap;
+  final VoidCallback onFavorite;
 
-  const MovieListItem({super.key, required this.movie, required this.onTap});
+  const MovieListItem({
+    super.key,
+    required this.movie,
+    required this.onTap,
+    required this.onFavorite,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +137,19 @@ class MovieListItem extends StatelessWidget {
         ),
         title: Text(movie.title),
         subtitle: Text(movie.cast.first),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Icon(
+                movie.isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: movie.isFavorite ? Colors.red : null,
+              ),
+              onPressed: onFavorite,
+            ),
+            const Icon(Icons.chevron_right),
+          ],
+        ),
         onTap: onTap,
       ),
     );

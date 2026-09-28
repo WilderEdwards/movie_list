@@ -1,8 +1,6 @@
 import '../models/movie.dart';
 
-// Static catalog used by HomeScreen. Poster files go in
-// assets/images/ and get wired up in a later commit.
-const List<Movie> sampleMovies = [
+final List<Movie> sampleMovies = [
   Movie(
     title: 'Inception',
     posterPath: 'assets/images/inception.jpg',
